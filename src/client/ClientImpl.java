@@ -25,6 +25,7 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
                     frame.whiteboardPanel.approved = true;
                 }
                 frame.whiteboardPanel.setCanvasFromBase64(base64Image);
+                frame.repaint();
                 frame.log("Canvas update from:" + fromUsername);
             }
         });

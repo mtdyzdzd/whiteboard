@@ -272,12 +272,14 @@ public class WhiteboardFrame extends JFrame {
             server = (IWhiteboardServer) registry.lookup("WhiteboardService");
             clientImpl = new ClientImpl(this);
 
-            if(isManager){
-                server.registerManager(username,clientImpl);
+            if (isManager) {
+                server.registerManager(username, clientImpl);
                 log("Whiteboard created successfully");
+                log("Connected to server successfully");
+            } else {
+                log("Connected to server. Waiting for manager approval...");
             }
-            log("Hi~Connected to server successfully");
-        }catch (Exception e){
+        } catch (Exception e) {
             log("Sry. Failed to connect to server: " + e.getMessage());
         }
     }
