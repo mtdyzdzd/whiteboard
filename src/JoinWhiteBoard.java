@@ -1,4 +1,3 @@
-import client.ClientImpl;
 import client.WhiteboardFrame;
 import server.IWhiteboardServer;
 
@@ -25,20 +24,29 @@ public class JoinWhiteBoard {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    // 先创建窗口
-                    WhiteboardFrame frame = new WhiteboardFrame(
-                            name, serverIP, serverPort, false);
+                WhiteboardFrame frame = new WhiteboardFrame(
+                        name, serverIP, serverPort, false);
 
-                    // 申请加入
-                    Registry registry = LocateRegistry.getRegistry(serverIP, serverPort);
-                    IWhiteboardServer server = (IWhiteboardServer) registry.lookup("WhiteboardService");
-                    server.requestJoin(name, frame.clientImpl);
+                if (frame.clientImpl == null) return;
 
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null,
-                            "Failed to connect: " + e.getMessage());
-                }
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            Registry registry = LocateRegistry.getRegistry(serverIP, serverPort);
+                            IWhiteboardServer server =
+                                    (IWhiteboardServer) registry.lookup("WhiteboardService");
+                            server.requestJoin(name, frame.clientImpl);
+                        } catch (Exception e) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    JOptionPane.showMessageDialog(frame,
+                                            "Failed to request join: " + e.getMessage(),
+                                            "Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                        }
+                    }
+                }).start();
             }
         });
     }

@@ -19,7 +19,9 @@ public class WhiteboardPanel extends JPanel {
     // remember the location of last point
     int lastX, lastY;
 
+
     public WhiteboardPanel() {
+        setPreferredSize(new Dimension(500, 400));
         // create a 500X400
         canvas = new BufferedImage(500, 400, BufferedImage.TYPE_INT_RGB);
         // create a temp one
@@ -73,6 +75,13 @@ public class WhiteboardPanel extends JPanel {
                     int[] xp = {startX, endX, (startX + endX) / 2};
                     int[] yp = {endY,   endY,  startY};
                     g2d.drawPolygon(xp, yp, 3);
+                }
+
+                if (tool.equals("line") || tool.equals("rect") ||
+                        tool.equals("circle") || tool.equals("triangle")) {
+                    Graphics2D tg = tempCanvas.createGraphics();
+                    tg.drawImage(canvas, 0, 0, null);
+                    tg.dispose();
                 }
 
                 repaint();

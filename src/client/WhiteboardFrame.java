@@ -161,7 +161,6 @@ public class WhiteboardFrame extends JFrame {
         connectToServer(serverIP, serverPort);
 
         pack();
-        setSize(600, 500);
         setLocationRelativeTo(null);
         setVisible(true);
     }

@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 
 
@@ -14,7 +14,7 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
     // 保存当前画布的 Base64 字符串
     String currentImage = "";
     // 保存所有在线客户端，用户名 → 客户端对象
-    HashMap<String, IClient> clients = new HashMap<>();
+    ConcurrentHashMap<String, IClient> clients = new ConcurrentHashMap<>();
     String managerName;
 
     public WhiteboardServerImpl() throws RemoteException {
@@ -26,7 +26,7 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
         currentImage = base64Image;
         System.out.println("Canvas update from:" + senderName);
         // Phase 2 再做：广播给其他所有客户端
-        for (String name : clients.keySet()) {
+        for (String name : new ArrayList<>(clients.keySet())) {
 
             //skip youself
             if (name.equals(senderName)) continue;;
@@ -59,15 +59,24 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
             return false;
         }
 
-        // 用弹窗通知管理员，在服务器端弹窗
-        int result = JOptionPane.showConfirmDialog(
-                null,
-                username + " wants to join the whiteboard. ALLOW or NOT?",
-                "New Join Request",
-                JOptionPane.YES_NO_OPTION
-        );
+        final int[] result = {-1};
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    result[0] = JOptionPane.showConfirmDialog(
+                            null,
+                            username + " wants to join the whiteboard. ALLOW or NOT?",
+                            "New Join Request",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                }
+            });
+        } catch (Exception e) {
+            client.onJoinRejected("Server error processing your request.");
+            return false;
+        }
 
-        if (result == JOptionPane.YES_OPTION) {
+        if (result[0] == JOptionPane.YES_OPTION) {
             // 同意加入
             clients.put(username, client);
             System.out.println(username + " joined");
@@ -124,7 +133,7 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
 
     public void managerQuit() throws RemoteException {
         System.out.println("Manager quit");
-        for (String name : clients.keySet()) {
+        for (String name : new ArrayList<>(clients.keySet())) {
             if (name.equals(managerName)) continue;
             try {
                 clients.get(name).onManagerQuit();
@@ -138,7 +147,7 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
     // 广播聊天消息给所有人
     public void sendChat(String username, String message) throws RemoteException {
         System.out.println("Chat from " + username + ": " + message);
-        for (String name : clients.keySet()) {
+        for (String name : new ArrayList<>(clients.keySet())) {
             try {
                 clients.get(name).receiveChat(username, message);
             } catch (Exception e) {
@@ -149,7 +158,7 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
 
     void broadcastUserList() {
         List<String> users = new ArrayList<>(clients.keySet());
-        for (String name : clients.keySet()) {
+        for (String name : new ArrayList<>(clients.keySet())) {
             try {
                 clients.get(name).updateUserList(users);
             } catch (Exception e) {
