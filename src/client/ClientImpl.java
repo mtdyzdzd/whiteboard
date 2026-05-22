@@ -21,6 +21,9 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
     public void receiveImage(String base64Image, String fromUsername) throws RemoteException {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                if (fromUsername.equals("server")) {
+                    frame.whiteboardPanel.approved = true;
+                }
                 frame.whiteboardPanel.setCanvasFromBase64(base64Image);
                 frame.log("Canvas update from:" + fromUsername);
             }

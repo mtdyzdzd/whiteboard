@@ -11,6 +11,8 @@ public class WhiteboardPanel extends JPanel {
     BufferedImage tempCanvas;
     Graphics2D g2d;
 
+    boolean approved = true;
+
     String tool = "pencil";
     Color color = Color.BLACK;
     int brushSize = 3;
@@ -39,6 +41,7 @@ public class WhiteboardPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             // 1-pressed
             public void mousePressed(MouseEvent e) {
+                if (!approved) return;
                 startX = e.getX();
                 startY = e.getY();
                 lastX = startX;
@@ -47,6 +50,7 @@ public class WhiteboardPanel extends JPanel {
 
             // 2-released
             public void mouseReleased(MouseEvent e) {
+                if (!approved) return;
                 int endX = e.getX();
                 int endY = e.getY();
 
@@ -92,6 +96,7 @@ public class WhiteboardPanel extends JPanel {
         addMouseMotionListener(new MouseMotionAdapter() {
 
             public void mouseDragged(MouseEvent e) {
+                if (!approved) return;
                 int curX = e.getX();
                 int curY = e.getY();
 

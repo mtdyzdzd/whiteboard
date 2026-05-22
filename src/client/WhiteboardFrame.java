@@ -134,6 +134,7 @@ public class WhiteboardFrame extends JFrame {
         // mouse click
         whiteboardPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
+                if (!whiteboardPanel.approved) return;
                 if(whiteboardPanel.tool.equals("text")){
                     String input = JOptionPane.showInputDialog("Please enter messages:");
                     if (input != null && !input.isEmpty()){
@@ -159,6 +160,10 @@ public class WhiteboardFrame extends JFrame {
 
         // connect RMI server
         connectToServer(serverIP, serverPort);
+
+        if (!isManager) {
+            whiteboardPanel.approved = false;
+        }
 
         pack();
         setLocationRelativeTo(null);
@@ -278,7 +283,7 @@ public class WhiteboardFrame extends JFrame {
     }
 
     void sendCanvasToServer(){
-        if (server == null) return;
+        if (server == null || !whiteboardPanel.approved) return;
         try{
             String base64 = whiteboardPanel.getCanvasAsBase64();
             server.broadcastImage(base64,username);
