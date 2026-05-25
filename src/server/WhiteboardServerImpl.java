@@ -1,6 +1,5 @@
 package server;
 
-import javax.swing.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -59,37 +58,16 @@ public class WhiteboardServerImpl extends UnicastRemoteObject
             return false;
         }
 
-        final int[] result = {-1};
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    result[0] = JOptionPane.showConfirmDialog(
-                            null,
-                            username + " wants to join the whiteboard. ALLOW or NOT?",
-                            "New Join Request",
-                            JOptionPane.YES_NO_OPTION
-                    );
-                }
-            });
-        } catch (Exception e) {
-            client.onJoinRejected("Server error processing your request.");
-            return false;
-        }
+        IClient managerClient = clients.get(managerName);
+        boolean approved = managerClient.onJoinRequest(username);
 
-        if (result[0] == JOptionPane.YES_OPTION) {
-            // 同意加入
+        if (approved) {
             clients.put(username, client);
             System.out.println(username + " joined");
-
-            // 把当前画布同步给新用户
             client.receiveImage(currentImage, "server");
-
-            // 更新所有人的用户列表
             broadcastUserList();
             return true;
-
         } else {
-            // 拒绝加入
             client.onJoinRejected("Your request was rejected by the manager.");
             System.out.println(username + " was rejected");
             return false;

@@ -93,4 +93,23 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
             }
         });
     }
+
+    public boolean onJoinRequest(String username) throws RemoteException {
+        final int[] result = {-1};
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    result[0] = JOptionPane.showConfirmDialog(
+                            frame,
+                            username + " wants to share your whiteboard. Allow?",
+                            "New Join Request",
+                            JOptionPane.YES_NO_OPTION
+                    );
+                }
+            });
+        } catch (Exception e) {
+            return false;
+        }
+        return result[0] == JOptionPane.YES_OPTION;
+    }
 }

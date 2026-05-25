@@ -23,4 +23,7 @@ public interface IClient extends Remote {
 
     // 收到聊天消息
     void receiveChat(String username, String message) throws RemoteException;
+
+    // 管理员审批加入请求
+    boolean onJoinRequest(String username) throws RemoteException;
 }
