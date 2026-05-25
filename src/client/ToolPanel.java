@@ -23,14 +23,12 @@ public class ToolPanel extends JPanel {
         this.wb = wb;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // 第一行：工具按钮
         JPanel toolRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addToolButtons(toolRow);
 
-        // 第二行：颜色 + size
         JPanel colorRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addColorButtons(colorRow);
-        addBrushSize(colorRow);  // size移到颜色旁边
+        addBrushSize(colorRow);
 
         add(toolRow);
         add(colorRow);

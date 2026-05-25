@@ -16,13 +16,12 @@ import java.awt.image.BufferedImage;
 public class WhiteboardFrame extends JFrame {
 
     WhiteboardPanel whiteboardPanel;
-    IWhiteboardServer server; // RMI 服务器引用
+    IWhiteboardServer server;
     public ClientImpl clientImpl;
 
     String username;
     boolean isManager;
 
-    // 用户列表
     DefaultListModel<String> userListModel;
     JList<String> userList;
     // show log
@@ -40,12 +39,10 @@ public class WhiteboardFrame extends JFrame {
         whiteboardPanel = new WhiteboardPanel();
         ToolPanel toolPanel = new ToolPanel(whiteboardPanel);
 
-        // 管理员加File菜单
         if (isManager) {
             setJMenuBar(buildMenuBar());
         }
 
-        // 创建用户列表面板
         userListModel = new DefaultListModel<>();
         userList = new JList<>(userListModel);
         userList.setPreferredSize(new Dimension(150,200));
@@ -77,12 +74,10 @@ public class WhiteboardFrame extends JFrame {
         chatInputPanel.add(chatInput, BorderLayout.CENTER);
         chatInputPanel.add(sendBtn, BorderLayout.EAST);
 
-        // 右侧面板，在if之前创建
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(chatScroll, BorderLayout.CENTER);
         rightPanel.add(chatInputPanel, BorderLayout.SOUTH);
 
-        // 管理员才有踢人按钮
         if (isManager) {
             JButton kickBtn = new JButton("Kick");
             kickBtn.addActionListener(new ActionListener() {
@@ -111,7 +106,6 @@ public class WhiteboardFrame extends JFrame {
             userPanel.add(kickBtn, BorderLayout.SOUTH);
             rightPanel.add(userPanel, BorderLayout.NORTH);
         } else {
-            // 普通用户没有Kick按钮，直接加userScroll
             rightPanel.add(userScroll, BorderLayout.NORTH);
         }
 
@@ -145,7 +139,6 @@ public class WhiteboardFrame extends JFrame {
             }
         });
 
-        // 关闭窗口处理
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 handleClose();
@@ -170,7 +163,6 @@ public class WhiteboardFrame extends JFrame {
         setVisible(true);
     }
 
-    // File菜单（只有管理员）
     JMenuBar buildMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
@@ -181,7 +173,6 @@ public class WhiteboardFrame extends JFrame {
         JMenuItem saveAsItem = new JMenuItem("Save As");
         JMenuItem closeItem = new JMenuItem("Close");
 
-        // clean the canvas and 广播
         newItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 whiteboardPanel.clearCanvas();
@@ -190,7 +181,6 @@ public class WhiteboardFrame extends JFrame {
             }
         });
 
-        // Open：读取图片文件，显示并广播
         openItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
@@ -209,27 +199,23 @@ public class WhiteboardFrame extends JFrame {
             }
         });
 
-        // Save：保存到上次的路径
         final File[] lastSaveFile = {null};
         saveItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (lastSaveFile[0] != null) {
                     saveToFile(lastSaveFile[0]);
                 } else {
-                    // 没有上次路径就弹出选择框
                     saveAsAction(lastSaveFile);
                 }
             }
         });
 
-        // Save As：弹出文件选择框
         saveAsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveAsAction(lastSaveFile);
             }
         });
 
-        // Close：关闭应用
         closeItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 handleClose();
@@ -294,7 +280,6 @@ public class WhiteboardFrame extends JFrame {
         }
     }
 
-    // 发送聊天消息
     void sendChat() {
         String msg = chatInput.getText().trim();
         if (msg.isEmpty()) return;
@@ -306,14 +291,13 @@ public class WhiteboardFrame extends JFrame {
         }
     }
 
-    // 显示聊天消息
     public void appendChat(String from, String message) {
         chatArea.append(from + ": " + message + "\n");
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 
     // update user list
-    public  void updateUserList(List<String> users){
+    public void updateUserList(List<String> users){
         userListModel.clear();
         for (String u : users){
             userListModel.addElement(u);
@@ -321,7 +305,6 @@ public class WhiteboardFrame extends JFrame {
         log("Hi~ User list updated:" + users);
     }
 
-    // 关闭窗口时的处理
     void handleClose() {
         try {
             if (isManager) {
@@ -334,9 +317,9 @@ public class WhiteboardFrame extends JFrame {
                         JOptionPane.QUESTION_MESSAGE,
                         null,
                         options,
-                        options[1]  // 默认选中No
+                        options[1]
                 );
-                if (result == 0) {  // 0表示点了Yes
+                if (result == 0) {
                     server.managerQuit();
                     System.exit(0);
                 }

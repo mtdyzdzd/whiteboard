@@ -30,10 +30,8 @@ public class WhiteboardPanel extends JPanel {
         tempCanvas = new BufferedImage(500, 400, BufferedImage.TYPE_INT_RGB);
         g2d = canvas.createGraphics();
 
-        // 让线条更平滑
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 先把画布填成白色
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, 500, 400);
 
@@ -54,7 +52,6 @@ public class WhiteboardPanel extends JPanel {
                 int endX = e.getX();
                 int endY = e.getY();
 
-                // 规则图形在松开鼠标时才画
                 g2d.setColor(color);
                 g2d.setStroke(new BasicStroke(brushSize));
 
@@ -116,15 +113,12 @@ public class WhiteboardPanel extends JPanel {
                     repaint();
                 }
 
-                // 规则图形：拖动时画到临时画布上预览
                 if (tool.equals("line") || tool.equals("rect") ||
                         tool.equals("circle") || tool.equals("triangle")) {
 
-                    // 把主画布内容复制到临时画布
                     Graphics2D tg = tempCanvas.createGraphics();
                     tg.drawImage(canvas, 0, 0, null);
 
-                    // 在临时画布上画预览
                     tg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     tg.setColor(color);
                     tg.setStroke(new BasicStroke(brushSize));
@@ -172,7 +166,6 @@ public class WhiteboardPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 如果正在拖动规则图形，显示临时画布；否则显示主画布
         if (tool.equals("line") || tool.equals("rect") ||
                 tool.equals("circle") || tool.equals("triangle")) {
             g.drawImage(tempCanvas, 0, 0, null);
@@ -181,7 +174,6 @@ public class WhiteboardPanel extends JPanel {
         }
     }
 
-    // 把画布转成 Base64 字符串，用于通过 RMI 传输
     public String getCanvasAsBase64() {
         try {
             java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
@@ -194,7 +186,6 @@ public class WhiteboardPanel extends JPanel {
         }
     }
 
-    // 收到 Base64 字符串，还原成图片覆盖画布
     public void setCanvasFromBase64(String base64) {
         try {
             byte[] bytes = java.util.Base64.getDecoder().decode(base64);
@@ -206,7 +197,7 @@ public class WhiteboardPanel extends JPanel {
             e.printStackTrace();
         }
     }
-    // 清空画布（File→New用）
+
     public void clearCanvas() {
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, 500, 400);
@@ -214,7 +205,6 @@ public class WhiteboardPanel extends JPanel {
         repaint();
     }
 
-    // 把外部图片设置为画布内容（File→Open用）
     public void setCanvasImage(BufferedImage img) {
         g2d.drawImage(img, 0, 0, 500, 400, null);
         repaint();

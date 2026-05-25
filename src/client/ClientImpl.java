@@ -9,7 +9,6 @@ import java.util.List;
 
 public class ClientImpl extends UnicastRemoteObject implements IClient {
 
-    // 需要拿到主窗口来更新界面
     WhiteboardFrame frame;
 
     public ClientImpl(WhiteboardFrame frame) throws RemoteException {
@@ -17,7 +16,6 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
         this.frame = frame;
     }
 
-    // 收到服务器推送的最新画布
     public void receiveImage(String base64Image, String fromUsername) throws RemoteException {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -31,7 +29,6 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
         });
     }
 
-    // 被管理员踢出
     public void onKicked() throws RemoteException {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -44,7 +41,6 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
         });
     }
 
-    // 管理员关闭了白板
     public void onManagerQuit() throws RemoteException {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -64,7 +60,6 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
         });
     }
 
-    // 更新在线用户列表
     public void updateUserList(List<String> users) throws RemoteException {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -73,7 +68,6 @@ public class ClientImpl extends UnicastRemoteObject implements IClient {
         });
     }
 
-    // 申请被拒绝
     public void onJoinRejected(String reason) throws RemoteException {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

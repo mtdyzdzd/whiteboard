@@ -7,7 +7,7 @@ import java.rmi.registry.Registry;
 public class StartServer {
 
     public static void main(String[] args) {
-        int port = 8888; // 默认端口
+        int port = 8888;
 
         if (args.length >= 1) {
             port = Integer.parseInt(args[0]);
